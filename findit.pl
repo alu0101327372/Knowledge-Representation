@@ -118,6 +118,8 @@ item(key,basement).
 item(wine,'wine cellar').
 % library
 item(book,library).
+% living room
+item(recorder,'living room').
 
 
 % initial location and state of items
@@ -171,9 +173,6 @@ move(Location):-
 
 
 % Take item into invertory
-
-
-
 take(X):-  
 	canTake(X),
 	takeItem(X).
@@ -232,7 +231,7 @@ puzzle(go(library)):-
 	write('The door is locked...'),nl,
 	!, fail.
 
-% living room -> must get the recorder before leaving // review funtion
+% living room -> must get the recorder before leaving
 puzzle(go('living room')):-
     have(book,true),
     have(wine,true),
