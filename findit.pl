@@ -49,23 +49,23 @@ helpme:-
 
 
 %%%%% KB y reglas básicas --------------------------------------------
-% Ubicaciones
-Ubicacion(camino).
-Ubicacion(ciudad).
-Ubicacion('ciudad').
-Ubicacion(tunel).
-Ubicacion('tunel').
-Ubicacion(rio).
-Ubicacion(establo).
-Ubicacion(casa).
-Ubicacion('pasillo de la casa').
-Ubicacion(escalera).
-Ubicacion(sotano).
-Ubicacion('bodega').
-Ubicacion('segunda planta').
-Ubicacion(pasillo).
-Ubicacion(biblioteca).
-Ubicacion('sala').
+% ubicaciones
+ubicacion(camino).
+ubicacion(ciudad).
+ubicacion('ciudad').
+ubicacion(tunel).
+ubicacion('tunel').
+ubicacion(rio).
+ubicacion(establo).
+ubicacion(casa).
+ubicacion('pasillo de la casa').
+ubicacion(escalera).
+ubicacion(sotano).
+ubicacion('bodega').
+ubicacion('segunda planta').
+ubicacion(pasillo).
+ubicacion(biblioteca).
+ubicacion('sala').
 
 % Conexiones entre ubicaciones
 connection(camino,ciudad).
@@ -93,8 +93,8 @@ connect(X,Y):-
 
 
 % Reglas para obtener conexiones de ubicación
-list_connections(Ubicacion) :-
-	connect(X, Ubicacion),
+list_connections(ubicacion) :-
+	connect(X, ubicacion),
 	write(X),
 	nl,
     false.
@@ -131,8 +131,8 @@ tener(libro,false).
 
 
 %% Reglas para obtener elementos de la ubicación
-list_items(Ubicacion) :-
-	item(X, Ubicacion),
+list_items(ubicacion) :-
+	item(X, ubicacion),
 	write(X),
 	nl,
     false.
@@ -141,31 +141,31 @@ list_items(_).
 
 % Reglas para obtener toda la información de la ubicación actual
 info :-
-	aqui(Ubicacion),
-	write('Estás en '), write(Ubicacion),write(.), nl,
+	aqui(ubicacion),
+	write('Estás en '), write(ubicacion),write(.), nl,
 	write('Las cosas disponibles son:'), nl,
-	list_items(Ubicacion),
+	list_items(ubicacion),
 	write('Puedes ir a:'), nl,
-	list_connections(Ubicacion).
+	list_connections(ubicacion).
 
 
 %%%%% Reglas principales
 % mover de aquí (_) a una nueva ubicación
-ir(Ubicacion):-  
-    puzzle(ir(Ubicacion)),
-	puedeIr(Ubicacion),
-	mover(Ubicacion),
+ir(ubicacion):-  
+    puzzle(ir(ubicacion)),
+	puedeIr(ubicacion),
+	mover(ubicacion),
 	info.
 
-% Verifique que haya una conexión a la nueva Ubicacion
-puedeIr(Ubicacion):- 
+% Verifique que haya una conexión a la nueva ubicacion
+puedeIr(ubicacion):- 
     aqui(X),                   
-  	connect(X,Ubicacion),!.
+  	connect(X,ubicacion),!.
 
 % Retraer el predicado dinámico y afirmarlo con un nuevo valor
-mover(Ubicacion):-
+mover(ubicacion):-
     retract(aqui(_)),
-    asserta(aqui(Ubicacion)).
+    asserta(aqui(ubicacion)).
 
 
 % Coger un articulo
@@ -173,8 +173,8 @@ coger(X):-
 	puedeCoger(X),
 	cogerItem(X).
 puedeCoger(Item) :-
-  	aqui(Ubicacion),
-    (item(Item, Ubicacion) ->  
+  	aqui(ubicacion),
+    (item(Item, ubicacion) ->  
     write('Cogido '), 
     write(Item),
   	write(' al inventario.'),nl;
@@ -190,7 +190,7 @@ cogerItem(X):-
     retract(tener(X,_)),
   	asserta(tener(X,true)).
 
-%%%%% Reglas para Ubicacions bloqueadas
+%%%%% Reglas para ubicacions bloqueadas
 
 % camino -> debes conseguir el amuleto antes de salir
 puzzle(ir(camino)):-
