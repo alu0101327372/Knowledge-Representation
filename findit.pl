@@ -4,15 +4,15 @@
  * @author Marco Antonio Cabrera Hernández - alu0101327372
  * @email alu0101327372@ull.edu.es
  */
-use_module(biblioteca(persistency)).
+use_module(library(persistency)).
 
-%%%%% Reglas para el control del jueir ----------------------------------------
+%%%%% Rules for game control ----------------------------------------
 start:-
-  write('Bienvenido a Find the llave'), nl,
-  write('Te despiertas en una ciudad extraña, pero no recuerdas cómo llegaste allí...'), nl,
-  write('De hecho ni siquiera puedes recordar tu nombre ...'), nl,
-  write('Lo único que recuerdas es que tenías una llave y es muy especial para ti...'), nl,
-  write('Debe estar por aquí en alguna parte...'), nl,
+  write('Welcome to Forgotten'), nl,
+  write('You wake up in a strange forest, but you do not remember how you got here...'), nl,
+  write('In fact you can not even remeber your name...'), nl,
+  write('The one thing you remember is that you had a recorder, and it is very special to you...'), nl,
+  write('It must be around here somewhere...'), nl,
   helpme,
   repeat,
   write('>> '),
@@ -23,13 +23,14 @@ start:-
 
 end_condition(end).
 end_condition(_) :-
-  tener(amuleto,true),
-  write('Felicidades, has completado el jueir!').
+  have(recorder,true),
+  write('Congratulations, you have completed the game!').
 
-do(ir(X)):-ir(X),!.
-do(ir(X)):-ir(X),!.
-do(coger(X)):-coger(X),!.
+do(go(X)):-go(X),!.
+do(go(X)):-go(X),!.
+do(take(X)):-take(X),!.
 do(helpme):-helpme,!.
+%do(inventory):-inventory,!.
 do(info):-info,!.
 do(end):-
 	halt(0).
@@ -38,205 +39,209 @@ do(_) :-
 
 
 helpme:-
-  write('Usa los comandos de Prolog para jugar.'),nl,
-  write('Los comandos que puede utilizar son:'),nl,
-  write('ir([ubicación]). (ej. ir a la oficina)'),nl,
-  write('info. (ex. mira)'),nl,
-  write('tomar ([artículo]) (ej. tomar manzana)'),nl,
-  write('Presiona enter para continuar'),nl,
+  write('Use Prolog commands to play the game.'),nl,
+  write('The commands you can use are:'),nl,
+  write('go([location]). (ex. go to the office)'),nl,
+  write('info. (ex. look)'),nl,
+  write('take([item]) (ex. take apple)'),nl,
+  write('Hit enter to continue'),nl,
   get0(_),
   info.
 
 
-%%%%% KB y reglas básicas --------------------------------------------
-% ubicaciones
-ubicacion(camino).
-ubicacion(ciudad).
-ubicacion('ciudad').
-ubicacion(tunel).
-ubicacion('tunel').
-ubicacion(rio).
-ubicacion(establo).
-ubicacion(casa).
-ubicacion('pasillo de la casa').
-ubicacion(escalera).
-ubicacion(sotano).
-ubicacion('bodega').
-ubicacion('segunda planta').
-ubicacion(pasillo).
-ubicacion(biblioteca).
-ubicacion('sala').
+%%%%% KB and basic rules --------------------------------------------
+% Describe locations
+location(road).
+location(forest).
+location('deep forest').
+location(cave).
+location('deep cave').
+location(swamp).
+location(stable).
+location(castle).
+location('castle hall').
+location(staircase).
+location(basement).
+location('wine cellar').
+location('second floor').
+location(hallway).
+location(library).
+location('living room').
 
-% Conexiones entre ubicaciones
-connection(camino,ciudad).
-connection(ciudad, 'ciudad').
-connection('ciudad',rio).
-connection('ciudad',tunel).
-connection(tunel, 'tunel').
-connection(rio,establo).
-connection('ciudad',casa).
-connection(establo,casa).
-connection(casa, 'pasillo de la casa').
-connection('pasillo de la casa',escalera).
-connection(escalera, sotano).
-connection(escalera,'segunda planta').
-connection('segunda planta', pasillo).
-connection(sotano,'bodega').
-connection(pasillo,biblioteca).
-connection(pasillo,'sala').
+% Describe connections between locations
+connection(road,forest).
+connection(forest, 'deep forest').
+connection('deep forest',swamp).
+connection('deep forest',cave).
+connection(cave, 'deep cave').
+connection(swamp,stable).
+connection('deep forest',castle).
+connection(stable,castle).
+connection(castle, 'castle hall').
+connection('castle hall',staircase).
+connection(staircase, basement).
+connection(staircase,'second floor').
+connection('second floor', hallway).
+connection(basement,'wine cellar').
+connection(hallway,library).
+connection(hallway,'living room').
 
-% Reglas para hacer que la conexión sea recíproca
+% Rules for making connection reciprocate
 connect(X,Y):-
     connection(X,Y).
 connect(X,Y):-
     connection(Y,X).
 
 
-% Reglas para obtener conexiones de ubicación
-list_connections(ubicacion) :-
-	connect(X, ubicacion),
+
+
+% Rules to get conections of location
+list_connections(Location) :-
+	connect(X, Location),
 	write(X),
 	nl,
     false.
 list_connections(_).
 
 
-% Elementos en cada ubicación
-% Debemos declarar el predicado como dinámico si el objeto es "accesible"
-% ciudad
-item(calle,'ciudad').
-% establo
-item('linterna',establo).
-% tunel
-item(alarma,'tunel').
-% sotano
-item(llave,sotano).
-% bodega
-item(vino,'bodega').
-% biblioteca
-item(libro,biblioteca).
+% Describe items in each location
+% We must declare the predicate as dynamic if the object is "takable"
+% deep forest	
+item(branch,'deep forest').
+% stable
+item('torch',stable).
+% deep cave
+item(bell,'deep cave').
+% basement
+item(key,basement).
+% wine cellar
+item(wine,'wine cellar').
+% library
+item(book,library).
 
 
-% de ubicación inicial y estado de los artículos
-:-dynamic (aqui/1,tenercalle/1,item/2,tener/2).
-aqui(ciudad).
+% initial location and state of items
+:-dynamic (here/1,haveBranch/1,item/2,have/2).
+here(forest).
 
-tener(amuleto,false).
-tener(calle,false).
-tener(alarma,false).
-tener(linterna,false).
-tener(llave,false).
-tener(vino,false).
-tener(libro,false).
+have(recorder,false).
+have(branch,false).
+have(bell,false).
+have(torch,false).
+have(key,false).
+have(wine,false).
+have(book,false).
 
 
-%% Reglas para obtener elementos de la ubicación
-list_items(ubicacion) :-
-	item(X, ubicacion),
+
+%% Rules to get items from location
+list_items(Location) :-
+	item(X, Location),
 	write(X),
 	nl,
     false.
 list_items(_).
 
-
-% Reglas para obtener toda la información de la ubicación actual
+% Rule to get all information of current location
 info :-
-	aqui(ubicacion),
-	write('Estás en '), write(ubicacion),write(.), nl,
-	write('Las cosas disponibles son:'), nl,
-	list_items(ubicacion),
-	write('Puedes ir a:'), nl,
-	list_connections(ubicacion).
+	here(Location),
+	write('You are in the '), write(Location),write(.), nl,
+	write('The available things are:'), nl,
+	list_items(Location),
+	write('You can move to:'), nl,
+	list_connections(Location).
 
+%%%%% Main rules
 
-%%%%% Reglas principales
-% mover de aquí (_) a una nueva ubicación
-ir(ubicacion):-  
-    puzzle(ir(ubicacion)),
-	puedeIr(ubicacion),
-	mover(ubicacion),
+% Move from here(_) to new location
+go(Location):-  
+    puzzle(go(Location)),
+	canGo(Location),
+	move(Location),
 	info.
+% Verify there is a connection to new location
+canGo(Location):- 
+    here(X),                   
+  	connect(X,Location),!.
 
-% Verifique que haya una conexión a la nueva ubicacion
-puedeIr(ubicacion):- 
-    aqui(X),                   
-  	connect(X,ubicacion),!.
-
-% Retraer el predicado dinámico y afirmarlo con un nuevo valor
-mover(ubicacion):-
-    retract(aqui(_)),
-    asserta(aqui(ubicacion)).
+% Retract dynamic predicate and assert it with new value
+move(Location):-
+    retract(here(_)),
+    asserta(here(Location)).
 
 
-% Coger un articulo
-coger(X):-  
-	puedeCoger(X),
-	cogerItem(X).
-puedeCoger(Item) :-
-  	aqui(ubicacion),
-    (item(Item, ubicacion) ->  
-    write('Cogido '), 
+% Take item into invertory
+
+
+
+take(X):-  
+	canTake(X),
+	takeItem(X).
+canTake(Item) :-
+  	here(Location),
+    (item(Item, Location) ->  
+    write('Taken '), 
     write(Item),
-  	write(' al inventario.'),nl;
-    write('No se encuentra '), 
+  	write(' into inventory.'),nl;
+    write('Can not find '), 
     write(Item),
-  	write(' aqui'),
+  	write(' in here.'),
   	nl, fail
     ).
 
 %%% review function
-cogerItem(X):-  
+takeItem(X):-  
   	retract(item(X,_)),
-    retract(tener(X,_)),
-  	asserta(tener(X,true)).
+    retract(have(X,_)),
+  	asserta(have(X,true)).
 
-%%%%% Reglas para ubicacions bloqueadas
+%%%%% Rules for locked locations
 
-% camino -> debes conseguir el amuleto antes de salir
-puzzle(ir(camino)):-
-    tener(amuleto,true),
+% road -> must get the recorder before leaving
+puzzle(go(road)):-
+    have(recorder,true),
     !.
-puzzle(ir(camino)):-
-	write('No puedo irme, necesito mi amuleto...'),nl,
+puzzle(go(road)):-
+	write('I can not leave, I need my recorder...'),nl,
 	!, fail.
   	
-% tunel -> debes conseguir la linterna antes de entrar
-puzzle(ir('tunel')):-
-    tener(linterna,true),
-    write('Encendiste la linterna y entraste en el tunel ...'),nl,
+% deep cave -> must get the torch before entering
+puzzle(go('deep cave')):-
+    have(torch,true),
+    write('You lit up the torch and walk into the deep cave...'),nl,
   	!.
-puzzle(ir('tunel')):-
-	write('No puedo entrar, está demasiado oscuro ...'),nl,
+puzzle(go('deep cave')):-
+	write('I can not enter, its too dark...'),nl,
 	!, fail.
 
-% pasillo de la casa -> debes obtener la alarma antes de salir
-puzzle(ir('pasillo de la casa')):-
-    tener(alarma,true),
-    write('Tocaste la alarma y se abrió la puerta de la casa...'),nl,
+% castle hall -> must get the bell before leaving
+puzzle(go('castle hall')):-
+    have(bell,true),
+    write('You rang the bell and the castle door opened...'),nl,
   	!.
-puzzle(ir('pasillo de la casa')):-
-	write('Parece que necesito hacerla sonar para que me dejen...'),nl,
+puzzle(go('castle hall')):-
+	write('Seems like I need to ring to be let it...'),nl,
 	!, fail.
 
-% biblioteca -> debes conseguir la llave para entrar
-puzzle(ir(biblioteca)):-
-    tener(llave,true),
-    write('Abriste la puerta y entraste...'),nl,
+% library -> must get the key to enter
+puzzle(go(library)):-
+    have(key,true),
+    write('You unlocked the door and walked in...'),nl,
   	!.
-puzzle(ir(biblioteca)):-
-	write('La puerta está cerrada...'),nl,
+puzzle(go(library)):-
+	write('The door is locked...'),nl,
 	!, fail.
 
-% sala -> debes obtener el amuleto antes de irse
-puzzle(ir('sala')):-
-    tener(libro,true),
-    tener(vino,true),
-    write('El anciano tomó la jarra de vino y el libro.'),nl,
-    write('Dejó caer tu amuleto y tú lo recogiste.'),nl,
+% living room -> must get the recorder before leaving // review funtion
+puzzle(go('living room')):-
+    have(book,true),
+    have(wine,true),
+    write('The old man took the wine jug and the book.'),nl,
+    write('He dropped your recorder and you picked it up.'),nl,
   	!.
-puzzle(ir('sala')):-
-	write('Augusto es un anciano en la habitación.'),nl,
-	write('¡AHHHH no me molestes!.'),nl,
-	write('¡Necesito mi vino y mi libro! - el gritó'),nl,
+puzzle(go('living room')):-
+	write('There is an old man in the room.'),nl,
+	write('AHHHH do not disturb me!.'),nl,
+	write('I need my wine and my book! - he yelled'),nl,
 	!, fail.
 puzzle(_).
